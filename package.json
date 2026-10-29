@@ -1,0 +1,8 @@
+{
+  "name": "cbdventures-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Responsive installable Pretoria travel guide chatbot for web and mobile",
+  "scripts": {"start": "node server.js"},
+  "engines": {"node": ">=18"}
+}

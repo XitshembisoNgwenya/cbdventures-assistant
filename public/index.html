@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#2d50d7"><meta name="description" content="CBDventures Assistant — your Pretoria guide for attractions, restaurants and places to stay.">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg"><link rel="stylesheet" href="/styles.css"><title>CBDventures Assistant</title>
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar"><div class="brand-icon" aria-hidden="true">🤖</div><div class="brand"><h1>CBDventures Assistant</h1><div class="online"><span></span><span id="status">Online Guide</span></div></div><button class="new-chat" id="newChat" title="Start a new chat" aria-label="Start a new chat">＋</button></header>
+  <main class="chat" id="chat" aria-live="polite" aria-label="Chat messages"><div class="message assistant"><div class="bubble">Hi! I'm your Pretoria guide. Ask me anything about places to visit, eat, or stay!<time>Just now</time></div></div></main>
+  <section class="composer-area"><div class="quick-actions"><button data-prompt="What are some nearby attractions in Pretoria?">⌖ Nearby Attractions</button><button data-prompt="Recommend good restaurants in Pretoria by area and budget.">♜ Best Restaurants</button><button data-prompt="Help me find a good area to stay in Pretoria.">▣ Hotel Deals</button></div><form id="chatForm" class="composer"><textarea id="messageInput" rows="1" maxlength="2000" placeholder="Type a question…" aria-label="Type a question"></textarea><button class="send" type="submit" aria-label="Send message">➤</button></form><p class="disclaimer" id="modeNote">Pretoria guide · Demo answers until AI is connected</p></section>
+  <nav class="bottom-nav" aria-label="Main navigation"><button><span>⌂</span>Home</button><button><span>◫</span>Map</button><button class="active"><span>◯</span>Chat</button><button><span>▤</span>Pay</button><button><span>♙</span>Profile</button></nav>
+</div><script src="/app.js"></script>
+</body></html>

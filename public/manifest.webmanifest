@@ -1,0 +1,10 @@
+{
+  "name": "CBDventures Assistant",
+  "short_name": "CBDventures",
+  "description": "Your Pretoria guide for places to visit, eat and stay.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f9fd",
+  "theme_color": "#2d50d7",
+  "icons": [{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
