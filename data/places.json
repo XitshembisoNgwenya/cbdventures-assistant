@@ -17,14 +17,28 @@
     "name": "Es’kia Mphahlele Community Library (Sammy Marks)",
     "aliases": [
       "Sammy Marks library",
-      "Sammy Marks Square library"
+      "Sammy Marks Square library",
+      "Eskia Mphahlele",
+      "Es kia Mphahlele",
+      "Eskia Mpahlele",
+      "E’skia Mphahlele Library",
+      "Es’kia Mphahlele",
+      "Eskia library",
+      "Mphahlele library"
     ],
     "category": "study",
     "address": "Sammy Marks Building, corner Madiba and Sisulu Streets, Pretoria Central",
-    "description": "Public community library in the Sammy Marks area; entry and opening arrangements need checking.",
+    "description": "City of Tshwane public library near Sammy Marks Square. Published research describes reading and study areas, reference books, computers and internet services. The American Corner has hosted information and learning activities. Confirm current access and service availability.",
     "sourceLabel": "Public business listing and student request",
     "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Es%27kia+Mphahlele+Community+Library+Pretoria",
-    "verificationNote": "Specific building entrance not geocoded."
+    "verificationNote": "Specific building entrance not geocoded.",
+    "highlights": [
+      "It is a public library with reading and study areas and a range of books and reference resources.",
+      "Published research documents access to public computers, internet, Wi-Fi, photocopying and help with school or research projects.",
+      "It houses the American Corner Pretoria, which has hosted learning activities and EducationUSA information sessions."
+    ],
+    "detailsSource": "https://journals.co.za/doi/10.7553/87-1-1802",
+    "additionalSource": "https://educationusa.state.gov/centers/educationusa-advising-center-pretoria"
   },
   {
     "id": "student:expresso",
@@ -150,10 +164,22 @@
     "address": "291 Helen Joseph Street, Pretoria, 0001 (on campus)",
     "lat": -25.746467,
     "lng": 28.19252,
-    "description": "An on-campus library is confirmed by Richfield. Access and study-space availability should be checked with the campus.",
+    "description": "Richfield Pretoria Campus has a modern on-campus library alongside its learning facilities. Ask campus staff about access and study-space availability.",
     "sourceUrl": "https://www.richfield.ac.za/campuses/pretoria-campus",
     "sourceLabel": "Richfield official campus page",
-    "locationPrecision": "campus-reference"
+    "locationPrecision": "campus-reference",
+    "aliases": [
+      "Richfield library",
+      "campus library",
+      "our library",
+      "Richfield Pretoria library"
+    ],
+    "highlights": [
+      "It is on the Richfield Pretoria campus, making it convenient between lectures.",
+      "Richfield officially describes the campus as having a modern library, learning labs and interactive lecture rooms.",
+      "Students can ask campus staff about library access, available desks and study resources."
+    ],
+    "detailsSource": "https://www.richfield.ac.za/campuses/pretoria-campus"
   },
   {
     "id": "local:wimpy-sammy-marks",
