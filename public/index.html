@@ -1,14 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#2d50d7"><meta name="description" content="CBDventures Assistant — your Pretoria guide for attractions, restaurants and places to stay.">
-<link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg"><link rel="stylesheet" href="/styles.css"><title>CBDventures Assistant</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#122941">
+  <meta name="description" content="CBD Ventures AI Assistance: a student-friendly guide to places around the Pretoria campus, directions and study-day budgets.">
+  <link rel="icon" href="/icon.svg">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+  <title>CBD Ventures AI Assistance</title>
 </head>
 <body>
-<div class="app-shell">
-  <header class="topbar"><div class="brand-icon" aria-hidden="true">🤖</div><div class="brand"><h1>CBDventures Assistant</h1><div class="online"><span></span><span id="status">Online Guide</span></div></div><button class="new-chat" id="newChat" title="Start a new chat" aria-label="Start a new chat">＋</button></header>
-  <main class="chat" id="chat" aria-live="polite" aria-label="Chat messages"><div class="message assistant"><div class="bubble">Hi! I'm your Pretoria guide. Ask me anything about places to visit, eat, or stay!<time>Just now</time></div></div></main>
-  <section class="composer-area"><div class="quick-actions"><button data-prompt="What are some nearby attractions in Pretoria?">⌖ Nearby Attractions</button><button data-prompt="Recommend good restaurants in Pretoria by area and budget.">♜ Best Restaurants</button><button data-prompt="Help me find a good area to stay in Pretoria.">▣ Hotel Deals</button></div><form id="chatForm" class="composer"><textarea id="messageInput" rows="1" maxlength="2000" placeholder="Type a question…" aria-label="Type a question"></textarea><button class="send" type="submit" aria-label="Send message">➤</button></form><p class="disclaimer" id="modeNote">Pretoria guide · Demo answers until AI is connected</p></section>
-  <nav class="bottom-nav" aria-label="Main navigation"><button><span>⌂</span>Home</button><button><span>◫</span>Map</button><button class="active"><span>◯</span>Chat</button><button><span>▤</span>Pay</button><button><span>♙</span>Profile</button></nav>
-</div><script src="/app.js"></script>
-</body></html>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="CBD Ventures AI Assistance home">
+        <span class="brand-mark" aria-hidden="true">C<span class="star">✦</span></span>
+        <span class="brand-text"><strong>CBD Ventures <span>AI Assistance</span></strong><small>STUDENT GUIDE · PRETORIA</small></span>
+      </a>
+      <div class="header-right"><span class="header-dot" aria-hidden="true"></span><span>Campus-first guide</span><span class="small-divider"></span><a class="campus-link" href="https://www.google.com/maps/search/?api=1&amp;query=291+Helen+Joseph+Street+Pretoria" target="_blank" rel="noopener noreferrer">291 Helen Joseph St <span aria-hidden="true">↗</span></a></div>
+    </header>
+    <main class="layout">
+      <section class="explore-panel" id="explorePanel" aria-labelledby="exploreTitle">
+        <div class="intro">
+          <div class="eyebrow"><span class="eyebrow-line"></span> YOUR CAMPUS. YOUR CITY.</div>
+          <h1 id="exploreTitle">The city, <em>within reach.</em></h1>
+          <p>Food runs, study breaks and everyday essentials — discover spots around Richfield Pretoria.</p>
+          <div class="campus-banner"><span class="pin-icon">⌖</span><div><strong>Starting point: Richfield Pretoria</strong><span>291 Helen Joseph Street · All directions start here</span></div><span class="campus-badge">1 km radius</span></div>
+        </div>
+        <div class="directory-tools">
+          <div class="section-heading"><div><span class="overline">EXPLORE THE AREA</span><h2>Places near campus <span id="placesCount" class="count">…</span></h2></div><button class="refresh" id="refreshPlaces" type="button" title="Refresh places">↻ Refresh</button></div>
+          <label class="search-box"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="7.4"/><path d="m16 16 5 5"/></svg><input id="placeSearch" type="search" autocomplete="off" placeholder="Search Honchos, printing, library…" aria-label="Search places"><span class="search-shortcut">⌕</span></label>
+          <div class="category-strip" id="categories" aria-label="Filter place categories"></div>
+          <div class="tab-row" role="tablist" aria-label="Location verification"><button class="tab active" role="tab" aria-selected="true" id="allTab" data-tab="all" type="button">All places</button><button class="tab" role="tab" aria-selected="false" id="nearbyTab" data-tab="nearby" type="button">Verified radius <span id="nearbyTotal">0</span></button><button class="tab" role="tab" aria-selected="false" id="pendingTab" data-tab="pending" type="button">Student picks <span id="pendingTotal">0</span></button></div>
+          <p id="resultsNote" class="results-note" aria-live="polite"></p>
+        </div>
+        <div id="placesGrid" class="places-grid" aria-live="polite"></div>
+        <div id="placeMessage" class="place-message" hidden></div>
+        <footer class="directory-footer">Distances use straight-line map coordinates, not walking distance. Student picks without confirmed coordinates are shown separately. Prices are planning examples, not actual menus. <span id="directoryWarning"></span></footer>
+      </section>
+      <section class="assistant-panel" id="assistantPanel" aria-labelledby="assistantTitle">
+        <div class="assistant-head"><div class="assistant-logo" aria-hidden="true">✳</div><div><span class="overline">YOUR STUDENT SIDEKICK</span><h2 id="assistantTitle">Ask CBD Ventures AI</h2><p><span class="online-pip"></span><span id="status">Ready to help</span></p></div><button class="new-chat" type="button" id="newChat" title="Start a new conversation" aria-label="New conversation">↻</button></div>
+        <div class="chat" id="chat" role="log" aria-label="Chat messages" aria-live="polite"></div>
+        <div class="assistant-bottom">
+          <div class="prompt-title">QUICK QUESTIONS</div>
+          <div class="quick-actions" id="quickActions"><button type="button" data-prompt="What can I buy with R50?">💸 R50 food budget</button><button type="button" data-prompt="Where is Magwinya Zone?">📍 Magwinya Zone</button><button type="button" data-prompt="Where can I study nearby?">📚 Study spaces</button><button type="button" data-prompt="How do I get to Honchos from Richfield?">🗺️ Directions</button></div>
+          <form class="composer" id="chatForm"><label for="messageInput" class="sr-only">Message CBD Ventures AI Assistance</label><textarea id="messageInput" rows="1" maxlength="2000" placeholder="Ask anything about campus life…"></textarea><button class="send" type="submit" aria-label="Send message">↑</button></form>
+          <p class="assistant-fineprint" id="modeNote">Local guide active · answers work without an AI key</p>
+        </div>
+      </section>
+    </main>
+    <nav class="mobile-nav" aria-label="Mobile navigation"><button id="mobileExplore" class="active" type="button"><span>⌖</span> Explore</button><button id="mobileAssistant" type="button"><span>✳</span> Ask AI</button></nav>
+  </div>
+  <script src="/app.js" defer></script>
+</body>
+</html>

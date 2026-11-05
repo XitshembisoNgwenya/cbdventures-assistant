@@ -1,10 +1,17 @@
 {
-  "name": "CBDventures Assistant",
-  "short_name": "CBDventures",
-  "description": "Your Pretoria guide for places to visit, eat and stay.",
+  "name": "CBD Ventures AI Assistance",
+  "short_name": "CBD Ventures AI",
+  "description": "A student-focused directory and chatbot for places near Richfield Pretoria Campus.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f9fd",
-  "theme_color": "#2d50d7",
-  "icons": [{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "background_color": "#f4f6f8",
+  "theme_color": "#122941",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
