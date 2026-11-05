@@ -22,7 +22,7 @@ function findPlace(id){return allPlaces().find(p=>p.id===id);}
 function revealPlace(id){
   const place=findPlace(id);if(!place)return;
   state.tab=place.isWithinRadius?'nearby':'pending';state.category='all';state.search='';state.filterIds=null;
-  dom.search.value='';renderCategories();renderPlaces();switchMobile('explore');
+  dom.search.value='';renderCategories();renderPlaces();navigate('home');
   const card=[...dom.grid.querySelectorAll('.place-card')].find(n=>n.dataset.id===id);
   if(card){card.classList.add('highlight');card.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>card.classList.remove('highlight'),2800);}
 }
@@ -74,7 +74,7 @@ function buildCard(place){
   body.append(el('span',{class:'place-source'},'Source: '+place.source));
   const actions=el('div',{class:'place-actions'});
   const dir=el('a',{class:'directions',href:place.directionsUrl,target:'_blank',rel:'noopener noreferrer','aria-label':'Walking directions from Richfield Pretoria Campus to '+place.name},'↗ Directions from Richfield');
-  const ask=el('button',{class:'ask-place',type:'button'},'Ask ✳');ask.addEventListener('click',()=>{switchMobile('assistant');sendMessage('Tell me about '+place.name+' and what a student can budget there.');});
+  const ask=el('button',{class:'ask-place',type:'button'},'Ask ✳');ask.addEventListener('click',()=>{navigate('chat');sendMessage('Tell me about '+place.name+' and what a student can budget there.');});
   actions.append(dir,ask);body.append(actions);card.append(media,body);return card;
 }
 function renderPlaces(){
@@ -90,7 +90,30 @@ function renderPlaces(){
   if(!visible.length)dom.message.textContent=state.tab==='nearby'?'No mapped places meet this filter right now. Try Student picks or another category.':'No places match this filter. Try another category or a different search.';
   for(const b of document.querySelectorAll('[data-tab]')){const active=b.dataset.tab===state.tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));}
 }
-function switchMobile(view){dom.shell.dataset.mobileView=view;$('#mobileExplore').classList.toggle('active',view==='explore');$('#mobileAssistant').classList.toggle('active',view==='assistant');}
+function navigate(page, updateHash=true){
+  if(!['home','map','chat','pay','profile'].includes(page))page='home';
+  dom.shell.dataset.page=page;
+  $('#mainContent').hidden=['map','pay','profile'].includes(page);
+  for(const id of ['map','pay','profile'])$('#'+id+'Page').hidden=id!==page;
+  document.querySelectorAll('[data-page]').forEach(button=>{
+    const active=button.dataset.page===page;
+    button.classList.toggle('active',active);
+    if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+  });
+  if(updateHash && location.hash!=='#'+page)history.replaceState(null,'','#'+page);
+  if(page==='chat')dom.input.focus({preventScroll:true});
+}
+function switchMobile(view){navigate(view==='assistant'?'chat':'home');}
+function renderMapDestinations(){
+  const host=$('#mapDestinations');host.replaceChildren();
+  for(const p of allPlaces()){
+    const card=el('div',{class:'map-destination'});
+    const info=el('div');info.append(el('strong',{},p.name),el('small',{},p.address));
+    if(!p.isWithinRadius)info.append(el('small',{class:'pending-copy'},'Exact 1 km eligibility not verified'));
+    const anchor=el('a',{href:p.directionsUrl,target:'_blank',rel:'noopener noreferrer'},'Walking directions ↗');
+    card.append(info,anchor);host.append(card);
+  }
+}
 async function loadPlaces(){
   dom.resultsNote.textContent='Loading campus directory…';
   try{
@@ -98,7 +121,7 @@ async function loadPlaces(){
     const data=await r.json();
     state.places=Array.isArray(data.places)?data.places:[];state.pending=Array.isArray(data.pending)?data.pending:[];state.categories=Array.isArray(data.categories)?data.categories:[];
     dom.warning.textContent=data.warning?' '+data.warning:'';
-    renderCategories();renderPlaces();
+    renderCategories();renderPlaces();renderMapDestinations();
   }catch(error){dom.grid.replaceChildren();dom.message.hidden=false;dom.message.textContent='Unable to load the directory. Please check the server or your connection and tap Refresh.';dom.resultsNote.textContent='Offline or service unavailable';}
 }
 function attach(){
@@ -110,8 +133,9 @@ function attach(){
   dom.search.addEventListener('input',e=>{state.search=e.target.value;renderPlaces();});
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;renderPlaces();}));
   document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>sendMessage(b.dataset.prompt)));
-  $('#mobileExplore').addEventListener('click',()=>switchMobile('explore'));
-  $('#mobileAssistant').addEventListener('click',()=>switchMobile('assistant'));
+  document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
+  document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));
+  window.addEventListener('hashchange',()=>navigate(location.hash.slice(1),false));
 }
-attach();newConversation();loadPlaces();
+attach();newConversation();loadPlaces();navigate(location.hash.slice(1)||'home',false);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));

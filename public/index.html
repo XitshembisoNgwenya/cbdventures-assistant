@@ -19,7 +19,7 @@
       </a>
       <div class="header-right"><span class="header-dot" aria-hidden="true"></span><span>Campus-first guide</span><span class="small-divider"></span><a class="campus-link" href="https://www.google.com/maps/search/?api=1&amp;query=291+Helen+Joseph+Street+Pretoria" target="_blank" rel="noopener noreferrer">291 Helen Joseph St <span aria-hidden="true">↗</span></a></div>
     </header>
-    <main class="layout">
+    <main class="layout" id="mainContent">
       <section class="explore-panel" id="explorePanel" aria-labelledby="exploreTitle">
         <div class="intro">
           <div class="eyebrow"><span class="eyebrow-line"></span> YOUR CAMPUS. YOUR CITY.</div>
@@ -49,7 +49,20 @@
         </div>
       </section>
     </main>
-    <nav class="mobile-nav" aria-label="Mobile navigation"><button id="mobileExplore" class="active" type="button"><span>⌖</span> Explore</button><button id="mobileAssistant" type="button"><span>✳</span> Ask AI</button></nav>
+    <nav class="app-nav" aria-label="Main navigation">
+      <button type="button" data-page="home" class="active" aria-current="page"><span aria-hidden="true">⌂</span>Home</button>
+      <button type="button" data-page="map"><span aria-hidden="true">⌖</span>Map</button>
+      <button type="button" data-page="chat"><span aria-hidden="true">✳</span>Chat</button>
+      <button type="button" data-page="pay"><span aria-hidden="true">▤</span>Pay</button>
+      <button type="button" data-page="profile"><span aria-hidden="true">♙</span>Profile</button>
+    </nav>
+    <section id="mapPage" class="extra-page" hidden aria-label="Map and campus directions">
+      <div class="page-intro"><span class="overline">CAMPUS MAP</span><h1>Explore Pretoria from Richfield</h1><p>All walking-directions links start at Richfield Pretoria Campus, 291 Helen Joseph Street. Locations awaiting verification may not be within 1 km.</p></div>
+      <div class="map-frame-wrap"><iframe title="Map of Richfield Pretoria Campus" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=291%20Helen%20Joseph%20Street%2C%20Pretoria&amp;output=embed"></iframe></div>
+      <h2>Choose your destination</h2><div id="mapDestinations" class="map-destinations"></div>
+    </section>
+    <section id="payPage" class="extra-page" hidden aria-label="Pay page"><div class="page-intro"><span class="overline">CBD VENTURES</span><h1>Pay</h1><p>This section is reserved for the team's payment integration. No payments can be made here yet.</p><button type="button" class="page-action" data-go="chat">Ask the assistant</button></div></section>
+    <section id="profilePage" class="extra-page" hidden aria-label="Profile page"><div class="page-intro"><span class="overline">CBD VENTURES</span><h1>Profile</h1><p>This section is reserved for your team's account and sign-in functionality. It does not collect student credentials.</p><button type="button" class="page-action" data-go="chat">Ask the assistant</button></div></section>
   </div>
   <script src="/app.js" defer></script>
 </body>
