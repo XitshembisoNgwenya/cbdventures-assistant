@@ -1,5 +1,5 @@
 const $=selector=>document.querySelector(selector);
-const dom={shell:$('.shell'),grid:$('#placesGrid'),count:$('#placesCount'),nearbyTotal:$('#nearbyTotal'),pendingTotal:$('#pendingTotal'),search:$('#placeSearch'),categories:$('#categories'),resultsNote:$('#resultsNote'),message:$('#placeMessage'),warning:$('#directoryWarning'),chat:$('#chat'),form:$('#chatForm'),input:$('#messageInput'),send:$('.send'),status:$('#status'),mode:$('#modeNote')};
+const dom={shell:$('.shell'),grid:$('#placesGrid'),count:$('#placesCount'),nearbyTotal:$('#nearbyTotal'),pendingTotal:$('#pendingTotal'),search:$('#placeSearch'),categories:$('#categories'),resultsNote:$('#resultsNote'),message:$('#placeMessage'),warning:$('#directoryWarning'),chat:$('#chat'),form:$('#chatForm'),input:$('#messageInput'),send:$('.send'),status:$('#status'),mode:$('#modeNote'),featured:$('#featuredPlaces')};
 const state={places:[],pending:[],categories:[],category:'all',tab:'all',search:'',history:[],busy:false,filterIds:null};
 const DEFAULT_GREETING='Hey! 👋 I’m CBD Ventures AI Assistance, your student-friendly Pretoria guide. Looking for lunch, somewhere to study, or directions from Richfield? Ask me anything — even what you could plan to buy with R50.';
 const icons={all:'✦',food:'🍔',groceries:'🛒',health:'💊',printing:'🖨️',study:'📚',banking:'🏦',grooming:'✂️',transport:'🚌',fun:'🎭'};
@@ -26,13 +26,57 @@ function revealPlace(id){
   const card=[...dom.grid.querySelectorAll('.place-card')].find(n=>n.dataset.id===id);
   if(card){card.classList.add('highlight');card.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>card.classList.remove('highlight'),2800);}
 }
+function photoFor(place){return place.image || (place.hasPlacesPhoto ? '/api/photo?id='+encodeURIComponent(place.id) : null);}
+function makePreviewCard(place,context='featured'){
+  const card=el('article',{class:'preview-card',dataset:{id:place.id}});
+  const media=el('div',{class:'preview-image'});
+  const photo=photoFor(place);
+  if(photo){
+    const img=el('img',{src:photo,alt:'Storefront of '+place.name,loading:'lazy',decoding:'async'});
+    img.addEventListener('error',()=>fallbackMedia(media,place.category));
+    media.append(img);
+  }else fallbackMedia(media,place.category);
+  const distance=place.isWithinRadius?`~${place.distanceMeters} m from campus`:'Unverified';
+  media.append(el('span',{class:'preview-distance'},distance));
+  const body=el('div',{class:'preview-body'});
+  body.append(el('strong',{class:'preview-name',title:place.name},place.name));
+  body.append(el('span',{class:'preview-address',title:place.address},place.address));
+  const actions=el('div',{class:'preview-actions'});
+  const ask=el('button',{type:'button','aria-label':'Ask about '+place.name},'✳ Ask');
+  ask.addEventListener('click',()=>{
+    navigate('chat');
+    sendMessage(`Show me ${place.name} and how to get there from Richfield`);
+  });
+  const link=el('a',{href:place.directionsUrl,target:'_blank',rel:'noopener noreferrer','aria-label':'Walking directions from Richfield to '+place.name},'↗ Route');
+  actions.append(ask,link);body.append(actions);
+  card.append(media,body);
+  return card;
+}
+function renderFeatured(){
+  const all=allPlaces();
+  // Showcase genuine available photos first; mapped entries are ordered by distance.
+  // Unverified submitted places are clearly labelled rather than given fake distances.
+  const photoFirst=[
+    ...state.places.filter(p=>photoFor(p)),
+    ...state.pending.filter(p=>photoFor(p)).sort((a,b)=>{
+      const order=['student:magwinya-zone','student:honchos','student:asian-delight-shawarma','student:quick-bake','student:top-class-fast-foods','student:thuba-rush-kj','student:four-four-two'];
+      const rank=id=>order.includes(id)?order.indexOf(id):order.length;
+      return rank(a.id)-rank(b.id);
+    }),
+    ...state.places.filter(p=>!photoFor(p)),
+    ...state.pending.filter(p=>!photoFor(p))
+  ];
+  dom.featured.replaceChildren();
+  if(!all.length){dom.featured.append(el('p',{class:'featured-loading'},'Suggested places will appear when the directory is available.'));return;}
+  dom.featured.append(...photoFirst.slice(0,16).map(p=>makePreviewCard(p)));
+}
 function appendSuggestions(content,ids){
   if(!Array.isArray(ids)||!ids.length)return;
-  const chosen=[...new Set(ids)].map(findPlace).filter(Boolean).slice(0,4);
+  const chosen=[...new Set(ids)].map(findPlace).filter(Boolean).slice(0,3);
   if(!chosen.length)return;
-  const row=el('div',{class:'suggestions'});
-  for(const p of chosen){const b=el('button',{type:'button',class:'suggestion'},'📍 '+p.name);b.addEventListener('click',()=>revealPlace(p.id));row.append(b);}
-  content.append(row);
+  const rail=el('div',{class:'inline-place-rail',role:'group','aria-label':'Places mentioned in this answer'});
+  rail.append(...chosen.map(p=>makePreviewCard(p,'inline')));
+  content.append(rail);
 }
 async function sendMessage(text){
   text=String(text || '').trim();if(!text||state.busy)return;
@@ -101,7 +145,7 @@ function navigate(page, updateHash=true){
     if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
   });
   if(updateHash && location.hash!=='#'+page)history.replaceState(null,'','#'+page);
-  if(page==='chat')dom.input.focus({preventScroll:true});
+  if(page==='chat' && updateHash)dom.input.focus({preventScroll:true});
 }
 function switchMobile(view){navigate(view==='assistant'?'chat':'home');}
 function renderMapDestinations(){
@@ -121,7 +165,7 @@ async function loadPlaces(){
     const data=await r.json();
     state.places=Array.isArray(data.places)?data.places:[];state.pending=Array.isArray(data.pending)?data.pending:[];state.categories=Array.isArray(data.categories)?data.categories:[];
     dom.warning.textContent=data.warning?' '+data.warning:'';
-    renderCategories();renderPlaces();renderMapDestinations();
+    renderCategories();renderPlaces();renderFeatured();renderMapDestinations();
   }catch(error){dom.grid.replaceChildren();dom.message.hidden=false;dom.message.textContent='Unable to load the directory. Please check the server or your connection and tap Refresh.';dom.resultsNote.textContent='Offline or service unavailable';}
 }
 function attach(){
@@ -130,6 +174,8 @@ function attach(){
   dom.input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();dom.form.requestSubmit();}});
   $('#newChat').addEventListener('click',newConversation);
   $('#refreshPlaces').addEventListener('click',loadPlaces);
+  $('#featuredPrev').addEventListener('click',()=>dom.featured.scrollBy({left:-230,behavior:'smooth'}));
+  $('#featuredNext').addEventListener('click',()=>dom.featured.scrollBy({left:230,behavior:'smooth'}));
   dom.search.addEventListener('input',e=>{state.search=e.target.value;renderPlaces();});
   document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;renderPlaces();}));
   document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>sendMessage(b.dataset.prompt)));
@@ -137,5 +183,5 @@ function attach(){
   document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));
   window.addEventListener('hashchange',()=>navigate(location.hash.slice(1),false));
 }
-attach();newConversation();loadPlaces();navigate(location.hash.slice(1)||'home',false);
+attach();newConversation();loadPlaces();navigate(location.hash.slice(1)||'chat',false);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));

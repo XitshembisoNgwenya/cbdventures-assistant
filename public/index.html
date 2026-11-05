@@ -7,7 +7,7 @@
   <meta name="description" content="CBD Ventures AI Assistance: a student-friendly guide to places around the Pretoria campus, directions and study-day budgets.">
   <link rel="icon" href="/icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=5">
   <title>CBD Ventures AI Assistance</title>
 </head>
 <body>
@@ -20,6 +20,22 @@
       <div class="header-right"><span class="header-dot" aria-hidden="true"></span><span>Campus-first guide</span><span class="small-divider"></span><a class="campus-link" href="https://www.google.com/maps/search/?api=1&amp;query=291+Helen+Joseph+Street+Pretoria" target="_blank" rel="noopener noreferrer">291 Helen Joseph St <span aria-hidden="true">↗</span></a></div>
     </header>
     <main class="layout" id="mainContent">
+      <section class="assistant-panel" id="assistantPanel" aria-labelledby="assistantTitle">
+        <div class="assistant-head"><div class="assistant-logo" aria-hidden="true">✳</div><div><span class="overline">YOUR STUDENT SIDEKICK · RICHFIELD PRETORIA</span><h2 id="assistantTitle">CBD Ventures AI Assistance</h2><p><span class="online-pip"></span><span id="status">Ready to help</span></p></div><button class="new-chat" type="button" id="newChat" title="Start a new conversation" aria-label="New conversation">↻</button></div>
+        <div class="chat" id="chat" role="log" aria-label="Chat messages" aria-live="polite" aria-relevant="additions"></div>
+        <div class="assistant-bottom">
+          <div class="prompt-title">TRY ASKING</div>
+          <div class="quick-actions" id="quickActions"><button type="button" data-prompt="What can I buy with R50?">💸 R50 food budget</button><button type="button" data-prompt="Where is Magwinya Zone?">📍 Magwinya Zone</button><button type="button" data-prompt="Where can I study nearby?">📚 Study spaces</button><button type="button" data-prompt="How do I get to Honchos from Richfield?">🗺️ Directions</button></div>
+          <section class="featured" aria-labelledby="featuredTitle">
+            <div class="featured-heading"><h3 id="featuredTitle">Explore student picks</h3><div class="rail-controls"><span class="sr-only">Scroll through suggested places</span><button type="button" id="featuredPrev" aria-label="Previous places">‹</button><button type="button" id="featuredNext" aria-label="Next places">›</button></div></div>
+            <div id="featuredPlaces" class="featured-rail" role="region" aria-roledescription="carousel" aria-label="Suggested places with photos. Swipe left or right to browse" tabindex="0">
+              <p class="featured-loading">Loading nearby places…</p>
+            </div>
+          </section>
+          <form class="composer" id="chatForm"><label for="messageInput" class="sr-only">Message CBD Ventures AI Assistance</label><textarea id="messageInput" rows="1" maxlength="2000" placeholder="Ask CBD Ventures AI…"></textarea><button class="send" type="submit" aria-label="Send message">↑</button></form>
+          <p class="assistant-fineprint" id="modeNote">Suggestions are student-friendly; check prices and addresses before visiting</p>
+        </div>
+      </section>
       <section class="explore-panel" id="explorePanel" aria-labelledby="exploreTitle">
         <div class="intro">
           <div class="eyebrow"><span class="eyebrow-line"></span> YOUR CAMPUS. YOUR CITY.</div>
@@ -38,21 +54,11 @@
         <div id="placeMessage" class="place-message" hidden></div>
         <footer class="directory-footer">Distances use straight-line map coordinates, not walking distance. Student picks without confirmed coordinates are shown separately. Prices are planning examples, not actual menus. <span id="directoryWarning"></span></footer>
       </section>
-      <section class="assistant-panel" id="assistantPanel" aria-labelledby="assistantTitle">
-        <div class="assistant-head"><div class="assistant-logo" aria-hidden="true">✳</div><div><span class="overline">YOUR STUDENT SIDEKICK</span><h2 id="assistantTitle">Ask CBD Ventures AI</h2><p><span class="online-pip"></span><span id="status">Ready to help</span></p></div><button class="new-chat" type="button" id="newChat" title="Start a new conversation" aria-label="New conversation">↻</button></div>
-        <div class="chat" id="chat" role="log" aria-label="Chat messages" aria-live="polite"></div>
-        <div class="assistant-bottom">
-          <div class="prompt-title">QUICK QUESTIONS</div>
-          <div class="quick-actions" id="quickActions"><button type="button" data-prompt="What can I buy with R50?">💸 R50 food budget</button><button type="button" data-prompt="Where is Magwinya Zone?">📍 Magwinya Zone</button><button type="button" data-prompt="Where can I study nearby?">📚 Study spaces</button><button type="button" data-prompt="How do I get to Honchos from Richfield?">🗺️ Directions</button></div>
-          <form class="composer" id="chatForm"><label for="messageInput" class="sr-only">Message CBD Ventures AI Assistance</label><textarea id="messageInput" rows="1" maxlength="2000" placeholder="Ask anything about campus life…"></textarea><button class="send" type="submit" aria-label="Send message">↑</button></form>
-          <p class="assistant-fineprint" id="modeNote">Local guide active · answers work without an AI key</p>
-        </div>
-      </section>
     </main>
     <nav class="app-nav" aria-label="Main navigation">
-      <button type="button" data-page="home" class="active" aria-current="page"><span aria-hidden="true">⌂</span>Home</button>
+      <button type="button" data-page="home"><span aria-hidden="true">⌂</span>Home</button>
       <button type="button" data-page="map"><span aria-hidden="true">⌖</span>Map</button>
-      <button type="button" data-page="chat"><span aria-hidden="true">✳</span>Chat</button>
+      <button type="button" data-page="chat" class="active" aria-current="page"><span aria-hidden="true">✳</span>Chat</button>
       <button type="button" data-page="pay"><span aria-hidden="true">▤</span>Pay</button>
       <button type="button" data-page="profile"><span aria-hidden="true">♙</span>Profile</button>
     </nav>
@@ -64,6 +70,6 @@
     <section id="payPage" class="extra-page" hidden aria-label="Pay page"><div class="page-intro"><span class="overline">CBD VENTURES</span><h1>Pay</h1><p>This section is reserved for the team's payment integration. No payments can be made here yet.</p><button type="button" class="page-action" data-go="chat">Ask the assistant</button></div></section>
     <section id="profilePage" class="extra-page" hidden aria-label="Profile page"><div class="page-intro"><span class="overline">CBD VENTURES</span><h1>Profile</h1><p>This section is reserved for your team's account and sign-in functionality. It does not collect student credentials.</p><button type="button" class="page-action" data-go="chat">Ask the assistant</button></div></section>
   </div>
-  <script src="/app.js" defer></script>
+  <script src="/app.js?v=5" defer></script>
 </body>
 </html>
