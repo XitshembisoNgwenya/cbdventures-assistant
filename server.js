@@ -1,58 +1,87 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const PORT = process.env.PORT || 3000;
-const ROOT = path.join(__dirname, 'public');
-const mime = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.svg':'image/svg+xml'};
-function localReply(message) {
-  const q = message.toLowerCase();
-  if (/hello|hi\b|hey|good morning|good evening/.test(q)) return "Hi! 👋 Welcome to CBDventures Assistant, your Pretoria guide. I can help you explore attractions, find places to eat, and plan where to stay. What are you looking for?";
-  if (/restaurant|eat|food|cafe|hungry|lunch|dinner/.test(q)) return "Here are a few areas to explore for food in Pretoria:\n\n• **Church Square / central Pretoria** — historic city-centre options; check current opening times before going.\n• **Hatfield** — casual restaurants and student-friendly cafés.\n• **Hazelwood** — a popular area for dining and cafés.\n• **Menlyn Maine** — restaurants and a modern mixed-use precinct.\n\nTell me your budget and preferred food, and I’ll narrow it down. I can’t verify live availability in this offline demo.";
-  if (/attraction|visit|tour|things to do|museum|place to see/.test(q)) return "For a Pretoria outing, consider:\n\n• **Union Buildings** — gardens and city views.\n• **Freedom Park** — heritage and remembrance site.\n• **Voortrekker Monument** — history and panoramic views.\n• **National Zoological Garden** — a full-day wildlife outing.\n• **Church Square** — historic architecture in the city centre.\n\nCheck official visitor information for current hours, tickets and access before travelling.";
-  if (/hotel|stay|accommodation|guest house|place to sleep/.test(q)) return "I can help you compare places to stay. Popular areas to start searching include **Hatfield** (near the university and transport), **Arcadia** (central and close to embassies and attractions), and **Menlyn** (shopping and dining). What dates, nightly budget, and number of guests should I use? I can’t confirm live room prices in this demo.";
-  if (/church square/.test(q)) return "Church Square is in central Pretoria. For food nearby, search current listings around the square and check recent reviews and opening hours before heading out. If you tell me your budget, cuisine, and whether you want walking distance, I can help you choose what to look for.";
-  if (/budget|cheap|free/.test(q)) return "For a lower-cost Pretoria day, consider visiting public outdoor areas such as the Union Buildings gardens, walking around Church Square, or choosing cafés and casual eateries in Hatfield. Check access rules and current opening details before you go. What kind of outing do you have in mind?";
-  if (/help|what can you do|options/.test(q)) return "I can help with:\n\n📍 **Nearby Attractions** — sights, museums and activities\n🍽️ **Best Restaurants** — food ideas by area, cuisine and budget\n🛏️ **Hotel Deals** — areas to stay and what to compare\n🗺️ **Trip planning** — build a simple Pretoria itinerary\n\nAsk me a question or tap one of the quick buttons below.";
-  return "Thanks for your question! I’m the CBDventures Pretoria guide. I can help with attractions, restaurants, accommodation and simple itineraries. For more open-ended AI answers, add an AI provider API key to the server configuration. For now, try asking about restaurants, attractions, hotels, or budget-friendly activities.";
+const http=require('node:http');
+const fs=require('node:fs');
+const path=require('node:path');
+require('./src/config');
+const {getDirectory}=require('./src/directory');
+const {getChat,aiSettings}=require('./src/ai');
+const {getPhoto,photoSettings}=require('./src/photos');
+const PORT=Number(process.env.PORT || 3000);
+const ROOT=path.join(__dirname,'public');
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp'};
+const recentPlaces=new Map();
+const visits=new Map();
+function json(res,status,data,extras={}) {
+  res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...extras});res.end(JSON.stringify(data));
 }
-async function aiReply(messages) {
-  const key = process.env.AI_API_KEY;
-  if (!key) return localReply(messages[messages.length - 1]?.content || '');
-  const base = (process.env.AI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
-  const response = await fetch(base + '/chat/completions', {
-    method: 'POST', headers: {'Content-Type':'application/json','Authorization':'Bearer ' + key},
-    body: JSON.stringify({model: process.env.AI_MODEL || 'gpt-4o-mini', temperature: 0.6, messages: [
-      {role:'system', content:'You are CBDventures Assistant, a friendly and honest Pretoria, South Africa visitor guide. Help users discover attractions, restaurants, accommodation and itinerary ideas. Do not invent real-time prices, opening hours, availability or business facts; say when details need checking. Ask concise follow-up questions when useful. Keep answers readable on mobile.'},
-      ...messages.filter(m => ['user','assistant'].includes(m.role)).slice(-12)
-    ]})
+function rememberPlaces(places) {
+  const now=Date.now();for(const [id,p] of recentPlaces) if(p.until<now) recentPlaces.delete(id);
+  for(const place of places) recentPlaces.set(place.id,{place,until:now+10*60*1000});
+}
+function rateOK(req,route) {
+  const ip=String(req.socket.remoteAddress || 'unknown'); const key=ip+':'+route; const now=Date.now();
+  for(const [id,val] of visits) if(val.until<now) visits.delete(id);
+  const r=visits.get(key) || {num:0,until:now+60_000};
+  r.num++;visits.set(key,r);return r.num <= (route==='photo'?90:route==='chat'?30:50);
+}
+function parseBody(req,limit=20000) {
+  return new Promise((resolve,reject)=>{
+    let chunks=[],length=0;
+    req.on('data',chunk=>{length+=chunk.length;if(length>limit){reject(Object.assign(new Error('Request too large'),{status:413}));req.destroy();return;}chunks.push(chunk);});
+    req.on('end',()=>{try{resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')));}catch{reject(Object.assign(new Error('Invalid JSON'),{status:400}));}});
+    req.on('error',reject);
   });
-  if (!response.ok) throw new Error('AI provider returned ' + response.status);
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || 'Sorry, I could not create a reply just now.';
 }
-const server = http.createServer(async (req,res) => {
-  if (req.method === 'POST' && req.url === '/api/chat') {
-    let body=''; req.on('data', c => { body += c; if (body.length > 1e6) req.destroy(); });
-    req.on('end', async () => {
-      try {
-        const data = JSON.parse(body || '{}');
-        if (!Array.isArray(data.messages) || !data.messages.length) throw new Error('Please send a message.');
-        const reply = await aiReply(data.messages);
-        res.writeHead(200, {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});
-        res.end(JSON.stringify({reply, mode: process.env.AI_API_KEY ? 'ai' : 'demo'}));
-      } catch (e) {
-        res.writeHead(500, {'Content-Type':'application/json; charset=utf-8'});
-        res.end(JSON.stringify({error:'I could not answer just now. Check the server or AI configuration and try again.'}));
-      }
-    }); return;
+async function handler(req,res) {
+  res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');
+  res.setHeader('X-Content-Type-Options','nosniff');
+  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src https://www.openstreetmap.org; base-uri 'none'; object-src 'none'; form-action 'self'");
+  let url;try {url=new URL(req.url,'http://localhost');}catch {return json(res,400,{error:'Invalid URL'});}
+  if(req.method==='GET' && url.pathname==='/api/health') return json(res,200,{ok:true,app:'CBD Ventures AI Assistance',uptimeSeconds:Math.floor(process.uptime())});
+  if(req.method==='GET' && url.pathname==='/api/config') return json(res,200,{aiAvailable:aiSettings().configured,aiProvider:aiSettings().configured?aiSettings().provider:'local',photosAvailable:true,localPhotosIncluded:true,externalPhotoServiceAvailable:photoSettings().places||photoSettings().streetview,photoMode:photoSettings().mode});
+  if(req.method==='GET' && url.pathname==='/api/places') {
+    if(!rateOK(req,'places')) return json(res,429,{error:'Too many requests. Please try again shortly.'});
+    const directory=await getDirectory({category:url.searchParams.get('category'),q:url.searchParams.get('q')});
+    rememberPlaces([...directory.places,...directory.pending]);
+    return json(res,200,directory);
   }
-  let pathname = decodeURIComponent((req.url || '/').split('?')[0]);
-  if (pathname === '/') pathname = '/index.html';
-  const file = path.join(ROOT, pathname.replace(/^\/+/, ''));
-  if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end('Forbidden'); }
-  fs.readFile(file, (err, content) => {
-    if (err) { res.writeHead(404); return res.end('Not found'); }
-    res.writeHead(200, {'Content-Type':mime[path.extname(file)] || 'application/octet-stream','X-Content-Type-Options':'nosniff'}); res.end(content);
-  });
-});
-server.listen(PORT, () => console.log(`CBDventures Assistant running on http://localhost:${PORT}`));
+  if(req.method==='POST' && url.pathname==='/api/chat') {
+    if(!rateOK(req,'chat')) return json(res,429,{error:'Too many messages; try again in a minute.'});
+    const body=await parseBody(req);
+    if(!Array.isArray(body.messages) || body.messages.length<1 || body.messages.length>30 || body.messages.some(m=>!m || !['user','assistant'].includes(m.role) || typeof m.content!=='string' || m.content.length>2000) || body.messages.at(-1)?.role!=='user' || !body.messages.at(-1)?.content.trim()) return json(res,400,{error:'Send a valid message (up to 2,000 characters).'});
+    const directory=await getDirectory(); rememberPlaces([...directory.places,...directory.pending]);
+    const chat=await getChat(body.messages,directory.places,directory.pending);
+    return json(res,200,{...chat,directoryWarning:directory.warning});
+  }
+  if(req.method==='GET' && url.pathname==='/api/photo') {
+    if(!rateOK(req,'photo')) return json(res,429,{error:'Photo request limit reached.'});
+    const id=String(url.searchParams.get('id') || '').slice(0,160);
+    const remembered=recentPlaces.get(id);
+    if(!remembered || remembered.until<Date.now()) return json(res,404,{error:'Photo unavailable; refresh nearby places.'});
+    const place=remembered.place;
+    try {
+      const image=await getPhoto(place);
+      if(!image) return json(res,404,{error:'No business photo or nearby Street View image available.'});
+      if(image.redirect){res.writeHead(302,{'Location':image.redirect,'Cache-Control':'no-store','Referrer-Policy':'no-referrer'});return res.end();}
+      res.writeHead(200,{'Content-Type':image.contentType,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return res.end(image.buffer);
+    }catch(e){console.warn('Photo service error:',e.message);return json(res,503,{error:'Photo service temporarily unavailable.'});}
+  }
+  if(req.method!=='GET' && req.method!=='HEAD') return json(res,405,{error:'Method not allowed'});
+  let pathname;
+  try{pathname=decodeURIComponent(url.pathname);}catch{return json(res,400,{error:'Invalid path'});}
+  if(pathname==='/' ) pathname='/index.html';
+  const file=path.resolve(ROOT,'.'+pathname);
+  if(file!==ROOT && !file.startsWith(ROOT+path.sep)) return json(res,403,{error:'Forbidden'});
+  try {
+    const stat=await fs.promises.stat(file);
+    if(!stat.isFile()) return json(res,404,{error:'File not found'});
+    const content=await fs.promises.readFile(file);
+    const headers={'Content-Type':mime[path.extname(file)] || 'application/octet-stream','Cache-Control':pathname==='/sw.js'?'no-cache':'public, max-age=180'};
+    res.writeHead(200,headers);res.end(req.method==='HEAD'?undefined:content);
+  }catch{return json(res,404,{error:'File not found'});}
+}
+const server=http.createServer((req,res)=>handler(req,res).catch(error=>{
+  console.error('Request failed:',error.message);
+  if(!res.headersSent) json(res,error.status || 500,{error:error.status===413?'Request too large.':'Something went wrong. Please try again.'});
+}));
+if(require.main===module) server.listen(PORT,'0.0.0.0',()=>console.log(`CBD Ventures AI Assistance listening on port ${PORT}`));
+module.exports={server,handler};

@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: cbdventures-ai-assistance
+    runtime: node
+    plan: free
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DIRECTORY_PROVIDER
+        value: seed
+      - key: AI_PROVIDER
+        value: none
+      - key: PHOTO_MODE
+        value: auto
