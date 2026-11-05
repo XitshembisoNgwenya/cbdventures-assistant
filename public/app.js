@@ -70,8 +70,8 @@ function makePreviewCard(place,context='featured'){
     img.addEventListener('error',()=>fallbackMedia(media,place.category));
     media.append(img);
   }else fallbackMedia(media,place.category);
-  const distance=place.isWithinRadius?`~${place.distanceMeters} m from campus`:'Unverified';
-  media.append(el('span',{class:'preview-distance'},distance));
+  if(place.isWithinRadius && Number.isFinite(place.distanceMeters))
+    media.append(el('span',{class:'preview-distance'},`~${place.distanceMeters} m from campus`));
   const body=el('div',{class:'preview-body'});
   body.append(el('strong',{class:'preview-name',title:place.name},place.name));
   body.append(el('span',{class:'preview-address',title:place.address},place.address));
