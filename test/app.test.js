@@ -1,0 +1,27 @@
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const {server}=require('../server');
+const {loadSeeds,getDirectory,normalize,mapsDirections}=require('../src/directory');
+const {makeLocalReply}=require('../src/ai');
+const {CAMPUS}=require('../src/config');
+let url;
+test.before(async()=>{await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));url=`http://127.0.0.1:${server.address().port}`;});
+test.after(async()=>{await new Promise(resolve=>server.close(resolve));});
+const get=async path=>fetch(url+path);
+test('server health works',async()=>{const r=await get('/api/health');assert.equal(r.status,200);assert.equal((await r.json()).ok,true);});
+test('HTML, JS, CSS, and local business image are served',async()=>{for(const p of ['/','/app.js','/styles.css','/images/honchos.jpg']){const r=await get(p);assert.equal(r.status,200,p);assert.ok((await r.arrayBuffer()).byteLength>200);}});
+test('directory includes all ten requested student places',()=>{const ids=loadSeeds().map(p=>p.id);for(const id of ['absa-building','sammy-marks-library','expresso','four-four-two','asian-delight-shawarma','top-class-fast-foods','magwinya-zone','honchos','quick-bake','thuba-rush-kj'])assert.ok(ids.includes('student:'+id),id);});
+test('strict radius enforcement rejects anything beyond 1 km',()=>{assert.equal(normalize({name:'Faraway',category:'food',lat:CAMPUS.lat+0.012,lng:CAMPUS.lng}),null);const near=normalize({name:'Campus',category:'study',lat:CAMPUS.lat,lng:CAMPUS.lng});assert.equal(near.distanceMeters,0);});
+test('unknown coordinates are unverified and never fake 1 km distances',()=>{const p=normalize({name:'Unknown',category:'food',address:'A street'});assert.equal(p.distanceMeters,null);assert.equal(p.isWithinRadius,false);});
+test('mapped and pending are separated, nearest distance is sorted',async()=>{const d=await getDirectory({seedOnly:true});assert.equal(d.radiusMeters,1000);assert.ok(d.places.length>0);assert.ok(d.pending.length>=10);assert.ok(d.places.every(p=>p.distanceMeters<=1000&&p.isWithinRadius));for(let i=1;i<d.places.length;i++)assert.ok(d.places[i-1].distanceMeters<=d.places[i].distanceMeters);});
+test('directions always originate at Richfield address and use walking mode',()=>{const d=mapsDirections('171 Lilian Ngoyi Street, Pretoria');const u=new URL(d);assert.match(u.searchParams.get('origin'),/291 Helen Joseph Street/);assert.equal(u.searchParams.get('travelmode'),'walking');assert.match(u.searchParams.get('destination'),/171 Lilian Ngoyi/);});
+test('API returns user photographs, pending labels and stable IDs',async()=>{const r=await get('/api/places');const data=await r.json();const p=data.pending.find(p=>p.id==='student:honchos');assert.equal(p.image,'/images/honchos.jpg');assert.equal(p.distanceMeters,null);assert.match(p.directionsUrl,/291%20Helen%20Joseph/);});
+test('API category and search filtering work',async()=>{const r=await get('/api/places?category=food&q=honchos');const data=await r.json();assert.equal(data.places.length,0);assert.equal(data.pending.length,1);assert.equal(data.pending[0].name,'Honchos');});
+test('local chat answers submitted place name and directions',async()=>{const d=await getDirectory({seedOnly:true});const answer=makeLocalReply('How do I get to Honchos from Richfield?',d.places,d.pending);assert.match(answer.reply,/171 Lilian Ngoyi/);assert.match(answer.reply,/291 Helen Joseph/);assert.ok(answer.suggestedPlaceIds.includes('student:honchos'));});
+test('sample price guidance clearly discloses not real menu prices',async()=>{const d=await getDirectory({seedOnly:true});const answer=makeLocalReply('What are the prices at Magwinya Zone? I have R50',d.places,d.pending);assert.match(answer.reply,/no verified, current menu prices/);assert.match(answer.reply,/NOT prices charged/);assert.match(answer.reply,/R50/);});
+test('chat endpoint gives local fallback without keys',async()=>{const r=await fetch(url+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:'Where is Asian Delight Shawarma?'}]})});const data=await r.json();assert.equal(r.status,200);assert.equal(data.mode,'local');assert.match(data.reply,/223 Central Street/);assert.match(data.reply,/278/);});
+test('invalid input returns 400',async()=>{const r=await fetch(url+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[]})});assert.equal(r.status,400);});
+test('traversal attempt does not reveal private data',async()=>{const r=await get('/src/ai.js');assert.equal(r.status,404);});
+test('config endpoint does not expose keys',async()=>{const r=await get('/api/config');const txt=await r.text();assert.equal(r.status,200);assert.ok(!txt.includes('API_KEY'));assert.ok(!txt.includes('AIza'));});
+
+test('CBD Ventures branding appears throughout the public interface and health endpoint',async()=>{const html=await (await get('/')).text();assert.match(html,/CBD Ventures AI Assistance/);assert.doesNotMatch(html,/Richfield <span>Companion/);const health=await (await get('/api/health')).json();assert.equal(health.app,'CBD Ventures AI Assistance');const manifest=await (await get('/manifest.webmanifest')).json();assert.equal(manifest.name,'CBD Ventures AI Assistance');});

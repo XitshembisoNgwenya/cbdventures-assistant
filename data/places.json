@@ -1,0 +1,258 @@
+[
+  {
+    "id": "student:absa-building",
+    "name": "ABSA Building",
+    "aliases": [
+      "Absa",
+      "ABSA 230 Lilian Ngoyi"
+    ],
+    "category": "banking",
+    "address": "230 Lilian Ngoyi Street, Pretoria Central",
+    "description": "Student-submitted location. Confirm available bank and ATM services at the building.",
+    "sourceLabel": "Student-submitted address; not independently geocoded",
+    "verificationNote": "Banking facilities and entrance need confirmation."
+  },
+  {
+    "id": "student:sammy-marks-library",
+    "name": "Es’kia Mphahlele Community Library (Sammy Marks)",
+    "aliases": [
+      "Sammy Marks library",
+      "Sammy Marks Square library"
+    ],
+    "category": "study",
+    "address": "Sammy Marks Building, corner Madiba and Sisulu Streets, Pretoria Central",
+    "description": "Public community library in the Sammy Marks area; entry and opening arrangements need checking.",
+    "sourceLabel": "Public business listing and student request",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Es%27kia+Mphahlele+Community+Library+Pretoria",
+    "verificationNote": "Specific building entrance not geocoded."
+  },
+  {
+    "id": "student:expresso",
+    "name": "Expresso (Rosebank College building)",
+    "aliases": [
+      "Expresso",
+      "Expreso",
+      "Espresso"
+    ],
+    "category": "food",
+    "address": "Rosebank College building, Pretoria Central (exact street entrance not supplied)",
+    "description": "Coffee or light bites; ask at the college building for the precise location.",
+    "sourceLabel": "Student-submitted location; exact street address pending",
+    "verificationNote": "Exact street address and campus building need confirmation."
+  },
+  {
+    "id": "student:four-four-two",
+    "name": "Four Four Two — Sports & Music Lounge",
+    "aliases": [
+      "FourFour Two",
+      "442",
+      "fourfour two"
+    ],
+    "category": "fun",
+    "address": "399 Helen Joseph Street, Pretoria Central",
+    "description": "Sports and music lounge photographed by a student. Check entry requirements, events and operating hours.",
+    "image": "/images/four-four-two.jpg",
+    "sourceLabel": "Student-submitted storefront photograph and address"
+  },
+  {
+    "id": "student:asian-delight-shawarma",
+    "name": "Asian Delight Shawarma",
+    "aliases": [
+      "Asian Delight",
+      "shwarma",
+      "shawarma"
+    ],
+    "category": "food",
+    "address": "223 Central Street, Pretoria Central",
+    "submittedAddress": "278 Central Street, Pretoria Central",
+    "description": "Shawarma and takeaway food. Photograph shows 223 Central Street, different from the submitted 278.",
+    "image": "/images/asian-delight-shawarma.jpg",
+    "sourceLabel": "Student storefront photograph and independent business listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Asian+Delight+223+Central+Street+Pretoria",
+    "verificationNote": "Address conflict: user submitted 278; storefront sign and public listing show 223 Central Street."
+  },
+  {
+    "id": "student:top-class-fast-foods",
+    "name": "Top Class Fast Foods",
+    "aliases": [
+      "top class",
+      "topclass fast food"
+    ],
+    "category": "food",
+    "address": "287 Pretorius Street, Pretoria Central",
+    "submittedAddress": "295 Pretorius Street, Pretoria Central",
+    "description": "Fast food takeaway. Photo says 287 Pretorius Street, not the originally supplied 295.",
+    "image": "/images/top-class-fast-foods.jpg",
+    "sourceLabel": "Student storefront photograph and public restaurant listing",
+    "sourceUrl": "https://restaurantguru.com/Top-Class-Fast-Foods-Pretoria",
+    "verificationNote": "Address conflict: user submitted 295; storefront sign and independent listing show 287 Pretorius Street."
+  },
+  {
+    "id": "student:magwinya-zone",
+    "name": "Magwinya Zone",
+    "aliases": [
+      "magwinya",
+      "vetkoek",
+      "fat cakes"
+    ],
+    "category": "food",
+    "address": "266 Pretorius Street, Pretoria Central",
+    "description": "Magwinya takeaway, as photographed by the student. Exact building/entrance and current price list unverified.",
+    "image": "/images/magwinya-zone.jpg",
+    "sourceLabel": "Student-submitted storefront photo and address"
+  },
+  {
+    "id": "student:honchos",
+    "name": "Honchos",
+    "aliases": [
+      "Honchos chicken",
+      "honchos pretoria"
+    ],
+    "category": "food",
+    "address": "171 Lilian Ngoyi Street, Pretoria Central",
+    "description": "Chicken and fast food. The photo is of the submitted storefront.",
+    "image": "/images/honchos.jpg",
+    "sourceLabel": "Student-submitted storefront photo and address"
+  },
+  {
+    "id": "student:quick-bake",
+    "name": "Quick Bake",
+    "aliases": [
+      "Quick Bak",
+      "quickbak",
+      "Quick Bake confectioners"
+    ],
+    "category": "food",
+    "address": "7 Bank Lane, Pretoria Central",
+    "description": "Confectionery and coffee, according to the photographed storefront sign.",
+    "image": "/images/quick-bake.jpg",
+    "sourceLabel": "Student-submitted storefront photo and address"
+  },
+  {
+    "id": "student:thuba-rush-kj",
+    "name": "Thuba Rush KJ",
+    "aliases": [
+      "Thaba Rush KJ",
+      "Thuba Rush",
+      "Thaba Rush"
+    ],
+    "category": "food",
+    "address": "230 Pretorius Street, Pretoria Central",
+    "description": "Takeaway photographed by the student. Name on storefront reads THUBA RUSH KJ (submitted as Thaba Rush KJ).",
+    "image": "/images/thuba-rush-kj.jpg",
+    "sourceLabel": "Student-submitted storefront photo and address",
+    "verificationNote": "Photographed name is THUBA RUSH KJ; user initially wrote Thaba Rush KJ."
+  },
+  {
+    "id": "local:richfield-library",
+    "name": "Richfield Pretoria campus library",
+    "category": "study",
+    "address": "291 Helen Joseph Street, Pretoria, 0001 (on campus)",
+    "lat": -25.746467,
+    "lng": 28.19252,
+    "description": "An on-campus library is confirmed by Richfield. Access and study-space availability should be checked with the campus.",
+    "sourceUrl": "https://www.richfield.ac.za/campuses/pretoria-campus",
+    "sourceLabel": "Richfield official campus page",
+    "locationPrecision": "campus-reference"
+  },
+  {
+    "id": "local:wimpy-sammy-marks",
+    "name": "Wimpy — Sammy Marks Square",
+    "category": "food",
+    "address": "Shop 34B, Sammy Marks Square, Church Street, Pretoria Central",
+    "lat": -25.744995317268835,
+    "lng": 28.193253959812466,
+    "sourceUrl": "https://www.crave.co.za/establishment.asp?est=18443",
+    "sourceLabel": "Crave business listing",
+    "locationPrecision": "listed-coordinates"
+  },
+  {
+    "id": "local:woolworths-sammy-marks",
+    "name": "Woolworths — Sammy Marks",
+    "category": "groceries",
+    "address": "Sammy Marks Square, Helen Joseph Street, Pretoria Central",
+    "lat": -25.745855,
+    "lng": 28.193177,
+    "sourceUrl": "https://za.near-place.com/woolworths-sammy-marks-sammy-marks-square-church-helen-joseph-street-pretoria",
+    "sourceLabel": "Public store listing",
+    "locationPrecision": "listed-coordinates"
+  },
+  {
+    "id": "local:postnet-pretoria-cbd",
+    "name": "PostNet — Pretoria CBD",
+    "category": "printing",
+    "address": "Shop 8, Bothongo Plaza West, 271 Francis Baard Street, Pretoria",
+    "lat": -25.749321,
+    "lng": 28.1916662,
+    "description": "Printing, copying and stationery; check services and charges before visiting.",
+    "sourceUrl": "https://postnet.co.za/stores/pretoriacbd",
+    "coordinateSourceUrl": "https://www.courierslist.com/category/south-africa/pretoria/courier-service",
+    "sourceLabel": "PostNet official store page; public geolocation listing",
+    "locationPrecision": "listed-coordinates"
+  },
+  {
+    "id": "local:state-theatre",
+    "name": "South African State Theatre",
+    "category": "fun",
+    "address": "320 Pretorius Street, Pretoria Central",
+    "lat": -25.7465,
+    "lng": 28.1943,
+    "description": "Live performances; tickets and events have not been checked.",
+    "sourceUrl": "https://www.gov.za/about-government/contact-directory/soe/south-african-state-theatre-pretoria",
+    "coordinateSourceUrl": "https://sahistory.org.za/place/south-african-state-theatre",
+    "sourceLabel": "South African government; SA History Online coordinates",
+    "locationPrecision": "listed-coordinates"
+  },
+  {
+    "id": "local:specsavers-sammy-marks",
+    "name": "Spec-Savers — Sammy Marks",
+    "category": "health",
+    "address": "Shop 42, Sammy Marks Square, 330 Helen Joseph Street, Pretoria CBD",
+    "lat": -25.747833,
+    "lng": 28.194667,
+    "description": "Optometrist, not an emergency clinic or pharmacy.",
+    "sourceUrl": "https://www.specsavers.co.za/store/spec-savers-sammy-marks",
+    "sourceLabel": "Spec-Savers official store listing",
+    "locationPrecision": "listed-coordinates"
+  },
+  {
+    "id": "community:hunters-cave",
+    "name": "Hunter’s Cave Men’s Grooming",
+    "aliases": [
+      "Hunters Cave",
+      "mens haircut"
+    ],
+    "category": "grooming",
+    "address": "330 Helen Joseph Street, Sammy Marks Square, Pretoria Central",
+    "description": "Barber and grooming business publicly listed at Sammy Marks Square; exact storefront coordinate unverified.",
+    "sourceLabel": "Public business listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Hunter%27s+Cave+Men%27s+Grooming+Pretoria",
+    "verificationNote": "Confirm current business status, exact shop entrance and service prices."
+  },
+  {
+    "id": "community:helen-joseph-lilian-ngoyi-stop",
+    "name": "Helen Joseph & Lilian Ngoyi bus stop",
+    "aliases": [
+      "bus stop at richfield",
+      "Helen Joseph bus stop"
+    ],
+    "category": "transport",
+    "address": "Corner Helen Joseph Street and Lilian Ngoyi Street, Pretoria Central",
+    "description": "Public transport stop identified near Sammy Marks Square. Confirm the bus route and boarding side before travelling.",
+    "sourceLabel": "Public bus-stop listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Helen+Joseph+Lilian+Ngoyi+bus+stop+Pretoria",
+    "verificationNote": "Exact boarding point, services and times require confirmation."
+  },
+  {
+    "id": "community:the-pro-salon",
+    "name": "The Pro Salon",
+    "aliases": [
+      "pro salon"
+    ],
+    "category": "grooming",
+    "address": "14 Bureau Lane, Pretoria Central",
+    "description": "Publicly listed hair and beauty salon. Verify the current opening hours and services.",
+    "sourceLabel": "Public business listing",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=The+Pro+Salon+14+Bureau+Lane+Pretoria"
+  }
+]
