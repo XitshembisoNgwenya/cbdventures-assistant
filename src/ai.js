@@ -18,6 +18,37 @@ const FOOD_EXAMPLES=[
 ];
 const safeText=s=>String(s || '').replace(/\s+/g,' ').trim();
 const normalWords=s=>String(s || '').normalize('NFKD').toLowerCase().replace(/[’‘`']/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+function outOfAreaRequest(question) {
+  const words=normalWords(question);
+  const planet=words.match(/\b(?:on|in|at|near|around|from|the planet|planet)\s+(?:the\s+)?(mars|venus|jupiter|saturn|uranus|neptune|pluto|mercury|moon)\b/);
+  if(planet) {
+    const name=planet[1]==='moon'?'the Moon':planet[1][0].toUpperCase()+planet[1].slice(1);
+    return {reply:`There aren't any public restaurants or shops on ${name} that I can recommend. My directory covers places around Richfield Pretoria, so I can help you find real nearby options instead.`,suggestedPlaceIds:[]};
+  }
+  const otherCity=words.match(/\b(?:in|at|near|around|from|to)\s+(?:the\s+)?(johannesburg|joburg|durban|cape town|bloemfontein|polokwane|centurion|hatfield|menlyn|sandton|soweto|london|new york|paris|tokyo)\b/);
+  if(otherCity) {
+    const location=otherCity[1].replace(/\b\w/g,x=>x.toUpperCase());
+    return {reply:`I cover places within the Richfield Pretoria campus area, so I can't reliably recommend businesses in ${location} from this directory. If you want places near Richfield, I can help with those.`,suggestedPlaceIds:[]};
+  }
+  return null;
+}
+function editDistance(a,b,limit) {
+  if(Math.abs(a.length-b.length)>limit) return limit+1;
+  let previous=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++) {
+    const current=[i];
+    let smallest=i;
+    for(let j=1;j<=b.length;j++) {
+      const cost=a[i-1]===b[j-1]?0:1;
+      const next=Math.min(current[j-1]+1,previous[j]+1,previous[j-1]+cost);
+      current.push(next);
+      if(next<smallest)smallest=next;
+    }
+    if(smallest>limit)return limit+1;
+    previous=current;
+  }
+  return previous[b.length];
+}
 function matchedPlace(question,all) {
   const q=' '+normalWords(question)+' ';
   let best=null,score=0;
@@ -26,7 +57,24 @@ function matchedPlace(question,all) {
     if(alias.length<4 || !q.includes(' '+alias+' '))continue;
     if(alias.length>score){best=place;score=alias.length;}
   }
-  return best;
+  if(best)return best;
+  const words=normalWords(question).split(' ').filter(Boolean);
+  let candidate=null,lowest=Infinity,tied=false;
+  for(const place of all) for(const phrase of [place.name,...(place.aliases || [])]) {
+    const aliasWords=normalWords(phrase).split(' ').filter(Boolean);
+    const target=aliasWords.join('');
+    if(target.length<7 || words.length<aliasWords.length)continue;
+    const threshold=aliasWords.length===1?1:target.length>=11?3:2;
+    for(let i=0;i+aliasWords.length<=words.length;i++) {
+      const fragment=words.slice(i,i+aliasWords.length).join('');
+      const score=editDistance(fragment,target,threshold);
+      if(score===0 || score>threshold)continue;
+      const adjusted=score/target.length;
+      if(adjusted<lowest-0.001){candidate=place;lowest=adjusted;tied=false;}
+      else if(Math.abs(adjusted-lowest)<0.001 && candidate?.id!==place.id)tied=true;
+    }
+  }
+  return tied?null:candidate;
 }
 function selectedFromHistory(question,history,places,pending) {
   const all=[...places,...pending];
@@ -121,6 +169,8 @@ function placeAnswer(place,{navigation=false,distance=false}={}) {
 }
 function makeLocalReply(question,places,pending=[],messages=[]) {
   const q=safeText(question);
+  const outside=outOfAreaRequest(q);
+  if(outside) return outside;
   const all=[...places,...pending];
   const explicit=matchedPlace(q,all);
   const context=selectedFromHistory(q,messages.slice(0,-1),places,pending);
@@ -195,6 +245,7 @@ async function remoteReply(messages,places,pending) {
 }
 async function getChat(messages,places,pending=[]) {
   const local=makeLocalReply(messages.at(-1).content,places,pending,messages);
+  if(outOfAreaRequest(messages.at(-1).content)) return {...local,mode:'local',warning:null};
   const settings=aiSettings();
   if(!settings.configured) return {...local,mode:'local',warning:settings.provider==='none'?null:'AI provider is missing its server-side API key; local guide is active.'};
   try {
