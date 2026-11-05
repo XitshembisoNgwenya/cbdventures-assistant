@@ -40,6 +40,8 @@ function normalize(raw) {
     isWithinRadius:mapped,
     status:mapped?'within-radius':'needs-location-verification',
     description:String(raw.description || '').slice(0,500),
+    highlights:Array.isArray(raw.highlights)?raw.highlights.filter(x=>typeof x==='string').slice(0,6).map(x=>x.slice(0,300)):[],
+    detailsSource:typeof raw.detailsSource==='string' && /^https:\/\//.test(raw.detailsSource)?raw.detailsSource:null,
     image:typeof raw.image==='string' && /^\/images\/[a-z0-9-]+\.jpg$/.test(raw.image) ? raw.image : null,
     source:String(raw.sourceLabel || raw.source || 'Community submitted').slice(0,120),
     sourceUrl:typeof raw.sourceUrl==='string' && /^https:\/\//.test(raw.sourceUrl)?raw.sourceUrl:null,
