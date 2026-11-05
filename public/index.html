@@ -7,7 +7,7 @@
   <meta name="description" content="CBD Ventures AI Assistance: a student-friendly guide to places around the Pretoria campus, directions and study-day budgets.">
   <link rel="icon" href="/icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/styles.css?v=5">
+  <link rel="stylesheet" href="/styles.css?v=6">
   <title>CBD Ventures AI Assistance</title>
 </head>
 <body>
@@ -24,7 +24,8 @@
         <div class="assistant-head"><div class="assistant-logo" aria-hidden="true">✳</div><div><span class="overline">YOUR STUDENT SIDEKICK · RICHFIELD PRETORIA</span><h2 id="assistantTitle">CBD Ventures AI Assistance</h2><p><span class="online-pip"></span><span id="status">Ready to help</span></p></div><button class="new-chat" type="button" id="newChat" title="Start a new conversation" aria-label="New conversation">↻</button></div>
         <div class="chat" id="chat" role="log" aria-label="Chat messages" aria-live="polite" aria-relevant="additions"></div>
         <div class="assistant-bottom">
-          <div class="prompt-title">TRY ASKING</div>
+          <div class="suggestions-heading"><span class="prompt-title">STUDENT SUGGESTIONS</span><button type="button" class="suggestions-toggle" id="toggleSuggestions" aria-controls="suggestionTray" aria-expanded="true">Hide suggestions <span aria-hidden="true">⌄</span></button></div>
+          <div id="suggestionTray" class="suggestion-tray">
           <div class="quick-actions" id="quickActions"><button type="button" data-prompt="What can I buy with R50?">💸 R50 food budget</button><button type="button" data-prompt="Where is Magwinya Zone?">📍 Magwinya Zone</button><button type="button" data-prompt="Where can I study nearby?">📚 Study spaces</button><button type="button" data-prompt="How do I get to Honchos from Richfield?">🗺️ Directions</button></div>
           <section class="featured" aria-labelledby="featuredTitle">
             <div class="featured-heading"><h3 id="featuredTitle">Explore student picks</h3><div class="rail-controls"><span class="sr-only">Scroll through suggested places</span><button type="button" id="featuredPrev" aria-label="Previous places">‹</button><button type="button" id="featuredNext" aria-label="Next places">›</button></div></div>
@@ -32,6 +33,7 @@
               <p class="featured-loading">Loading nearby places…</p>
             </div>
           </section>
+          </div>
           <form class="composer" id="chatForm"><label for="messageInput" class="sr-only">Message CBD Ventures AI Assistance</label><textarea id="messageInput" rows="1" maxlength="2000" placeholder="Ask CBD Ventures AI…"></textarea><button class="send" type="submit" aria-label="Send message">↑</button></form>
           <p class="assistant-fineprint" id="modeNote">Suggestions are student-friendly; check prices and addresses before visiting</p>
         </div>
@@ -64,12 +66,18 @@
     </nav>
     <section id="mapPage" class="extra-page" hidden aria-label="Map and campus directions">
       <div class="page-intro"><span class="overline">CAMPUS MAP</span><h1>Explore Pretoria from Richfield</h1><p>All walking-directions links start at Richfield Pretoria Campus, 291 Helen Joseph Street. Locations awaiting verification may not be within 1 km.</p></div>
-      <div class="map-frame-wrap"><iframe title="Map of Richfield Pretoria Campus" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=291%20Helen%20Joseph%20Street%2C%20Pretoria&amp;output=embed"></iframe></div>
+      <section class="selected-route" id="selectedRoute" aria-label="Selected map destination" aria-live="polite">
+        <div class="route-icon" aria-hidden="true">⌖</div>
+        <div class="route-details"><span class="overline">STARTING AT RICHFIELD PRETORIA</span><strong id="routeTitle">Choose a destination below</strong><span id="routeDestination">291 Helen Joseph Street, Pretoria · Walking route links start here</span><span id="routeWarning" class="route-warning" hidden></span></div>
+        <a class="route-open-google" id="routeOpenGoogle" href="https://www.google.com/maps/search/?api=1&amp;query=291%20Helen%20Joseph%20Street%2C%20Pretoria" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
+      </section>
+      <div class="map-frame-wrap"><iframe id="routeMapFrame" title="Map of Richfield Pretoria Campus" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.openstreetmap.org/export/embed.html?bbox=28.19032%2C-25.748667%2C28.19472%2C-25.744267&amp;layer=mapnik&amp;marker=-25.746467%2C28.19252"></iframe></div>
+      <p class="map-disclaimer">The map preview shows Richfield and any verified destination pin; it does not draw a walking route. For actual walking directions from campus, choose <strong>Open in Google Maps</strong>. Student-submitted addresses may need checking.</p>
       <h2>Choose your destination</h2><div id="mapDestinations" class="map-destinations"></div>
     </section>
     <section id="payPage" class="extra-page" hidden aria-label="Pay page"><div class="page-intro"><span class="overline">CBD VENTURES</span><h1>Pay</h1><p>This section is reserved for the team's payment integration. No payments can be made here yet.</p><button type="button" class="page-action" data-go="chat">Ask the assistant</button></div></section>
     <section id="profilePage" class="extra-page" hidden aria-label="Profile page"><div class="page-intro"><span class="overline">CBD VENTURES</span><h1>Profile</h1><p>This section is reserved for your team's account and sign-in functionality. It does not collect student credentials.</p><button type="button" class="page-action" data-go="chat">Ask the assistant</button></div></section>
   </div>
-  <script src="/app.js?v=5" defer></script>
+  <script src="/app.js?v=6" defer></script>
 </body>
 </html>

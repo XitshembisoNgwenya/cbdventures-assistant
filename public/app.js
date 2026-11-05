@@ -1,6 +1,6 @@
 const $=selector=>document.querySelector(selector);
 const dom={shell:$('.shell'),grid:$('#placesGrid'),count:$('#placesCount'),nearbyTotal:$('#nearbyTotal'),pendingTotal:$('#pendingTotal'),search:$('#placeSearch'),categories:$('#categories'),resultsNote:$('#resultsNote'),message:$('#placeMessage'),warning:$('#directoryWarning'),chat:$('#chat'),form:$('#chatForm'),input:$('#messageInput'),send:$('.send'),status:$('#status'),mode:$('#modeNote'),featured:$('#featuredPlaces')};
-const state={places:[],pending:[],categories:[],category:'all',tab:'all',search:'',history:[],busy:false,filterIds:null};
+const state={places:[],pending:[],categories:[],category:'all',tab:'all',search:'',history:[],busy:false,filterIds:null,selectedRouteId:null,campus:{lat:-25.746467,lng:28.19252}};
 const DEFAULT_GREETING='Hey! 👋 I’m CBD Ventures AI Assistance, your student-friendly Pretoria guide. Looking for lunch, somewhere to study, or directions from Richfield? Ask me anything — even what you could plan to buy with R50.';
 const icons={all:'✦',food:'🍔',groceries:'🛒',health:'💊',printing:'🖨️',study:'📚',banking:'🏦',grooming:'✂️',transport:'🚌',fun:'🎭'};
 function el(tag,attributes={},text){const n=document.createElement(tag);for(const [k,v] of Object.entries(attributes)){if(k==='class')n.className=v;else if(k==='dataset')Object.entries(v).forEach(([dk,dv])=>n.dataset[dk]=dv);else n.setAttribute(k,String(v));}if(text!==undefined)n.textContent=text;return n;}
@@ -15,6 +15,47 @@ function addMessage(text,who,typing=false){
   if(!typing)content.append(el('div',{class:'msg-time'},stamp()));
   row.append(content);dom.chat.append(row);dom.chat.scrollTop=dom.chat.scrollHeight;
   return {row,content};
+}
+function setSuggestionsCollapsed(collapsed){
+  const tray=$('#suggestionTray'),toggle=$('#toggleSuggestions');
+  tray.hidden=Boolean(collapsed);
+  toggle.setAttribute('aria-expanded',String(!collapsed));
+  toggle.innerHTML=collapsed?'Show places &amp; ideas <span aria-hidden="true">⌃</span>':'Hide suggestions <span aria-hidden="true">⌄</span>';
+  dom.shell.classList.toggle('chat-has-questions',Boolean(collapsed));
+}
+function scrollToReply(row){
+  requestAnimationFrame(()=>{
+    if(!row.isConnected)return;
+    const offset=row.getBoundingClientRect().top-dom.chat.getBoundingClientRect().top;
+    dom.chat.scrollTop+=offset-10;
+  });
+}
+function mapPreviewUrl(place){
+  const campus=state.campus;
+  const hasPoint=Boolean(place && place.isWithinRadius && Number.isFinite(place.lat) && Number.isFinite(place.lng));
+  const lat=hasPoint?place.lat:campus.lat,lng=hasPoint?place.lng:campus.lng;
+  const pad=.0022;
+  const minLat=Math.min(lat,campus.lat)-pad,maxLat=Math.max(lat,campus.lat)+pad;
+  const minLng=Math.min(lng,campus.lng)-pad,maxLng=Math.max(lng,campus.lng)+pad;
+  const bbox=[minLng,minLat,maxLng,maxLat].join(',');
+  return 'https://www.openstreetmap.org/export/embed.html?bbox='+encodeURIComponent(bbox)+'&layer=mapnik&marker='+encodeURIComponent(`${lat},${lng}`);
+}
+function showRoute(place){
+  if(!place)return;
+  state.selectedRouteId=place.id;
+  $('#routeTitle').textContent=place.name;
+  $('#routeDestination').textContent='From Richfield, 291 Helen Joseph Street → '+place.address;
+  const warning=$('#routeWarning');
+  warning.hidden=Boolean(place.isWithinRadius && !place.verificationNote);
+  warning.textContent=[place.verificationNote,(!place.isWithinRadius?'The map marks Richfield only because the destination position has not been verified.':'The pin marks a mapped location, not a walking route.')].filter(Boolean).join(' ');
+  const external=$('#routeOpenGoogle');
+  external.href=place.directionsUrl;
+  external.setAttribute('aria-label','Open walking directions from Richfield Pretoria to '+place.name+' in Google Maps');
+  const frame=$('#routeMapFrame');
+  frame.src=mapPreviewUrl(place);
+  frame.title=place.isWithinRadius?'Map preview of Richfield and '+place.name:'Campus map; exact location of '+place.name+' awaiting verification';
+  renderMapDestinations();
+  navigate('map');
 }
 function cleanHistory(){state.history=state.history.slice(-18);}
 function allPlaces(){return [...state.places,...state.pending];}
@@ -47,7 +88,8 @@ function makePreviewCard(place,context='featured'){
     navigate('chat');
     sendMessage(`Show me ${place.name} and how to get there from Richfield`);
   });
-  const link=el('a',{href:place.directionsUrl,target:'_blank',rel:'noopener noreferrer','aria-label':'Walking directions from Richfield to '+place.name},'↗ Route');
+  const link=el('button',{type:'button','aria-label':'Open in-app map from Richfield to '+place.name},'↗ Map');
+  link.addEventListener('click',()=>showRoute(place));
   actions.append(ask,link);body.append(actions);
   card.append(media,body);
   return card;
@@ -81,6 +123,7 @@ function appendSuggestions(content,ids){
 async function sendMessage(text){
   text=String(text || '').trim();if(!text||state.busy)return;
   state.busy=true;dom.send.disabled=true;
+  setSuggestionsCollapsed(true);
   addMessage(text,'user');state.history.push({role:'user',content:text});cleanHistory();
   dom.input.value='';resizeInput();dom.status.textContent='Thinking…';
   const typing=addMessage('Finding the best campus answer…','assistant',true);
@@ -90,13 +133,14 @@ async function sendMessage(text){
     if(!response.ok)throw Error(data.error || 'Chat request failed');
     typing.row.remove();const result=addMessage(data.reply,'assistant');appendSuggestions(result.content,data.suggestedPlaceIds);
     state.history.push({role:'assistant',content:data.reply});cleanHistory();
+    scrollToReply(result.row);
     dom.status.textContent=data.mode==='ai'?'AI assistant ready':'Local student guide ready';
     dom.mode.textContent=data.warning || (data.mode==='ai'?'AI-enabled · real-world details may need checking':'Built-in student guide · no AI key needed');
-  }catch(error){typing.row.remove();addMessage('I couldn’t reach the chat service. Please check your connection and try again. You can still browse the directory.', 'assistant');dom.status.textContent='Connection issue';}
-  finally{state.busy=false;dom.send.disabled=false;dom.input.focus();dom.chat.scrollTop=dom.chat.scrollHeight;}
+  }catch(error){typing.row.remove();const result=addMessage('I couldn’t reach the chat service. Please check your connection and try again. You can still browse the directory.', 'assistant');scrollToReply(result.row);dom.status.textContent='Connection issue';}
+  finally{state.busy=false;dom.send.disabled=false;dom.input.focus({preventScroll:true});}
 }
 function resizeInput(){dom.input.style.height='auto';dom.input.style.height=Math.min(dom.input.scrollHeight,112)+'px';}
-function newConversation(){state.history=[];dom.chat.replaceChildren();addMessage(DEFAULT_GREETING,'assistant');dom.status.textContent='Ready to help';dom.mode.textContent='Ask about student budgets, directions or nearby places';}
+function newConversation(){state.history=[];setSuggestionsCollapsed(false);dom.chat.replaceChildren();addMessage(DEFAULT_GREETING,'assistant');dom.status.textContent='Ready to help';dom.mode.textContent='Ask about student budgets, directions or nearby places';}
 function renderCategories(){
   dom.categories.replaceChildren();
   const all=[{id:'all',label:'All places'},...state.categories];
@@ -117,7 +161,8 @@ function buildCard(place){
   if(!place.isWithinRadius)body.append(el('div',{class:'place-warning'},'1 km eligibility not confirmed; directions are a destination search.'));
   body.append(el('span',{class:'place-source'},'Source: '+place.source));
   const actions=el('div',{class:'place-actions'});
-  const dir=el('a',{class:'directions',href:place.directionsUrl,target:'_blank',rel:'noopener noreferrer','aria-label':'Walking directions from Richfield Pretoria Campus to '+place.name},'↗ Directions from Richfield');
+  const dir=el('button',{class:'directions',type:'button','aria-label':'Show map from Richfield Pretoria Campus to '+place.name},'↗ Map from Richfield');
+  dir.addEventListener('click',()=>showRoute(place));
   const ask=el('button',{class:'ask-place',type:'button'},'Ask ✳');ask.addEventListener('click',()=>{navigate('chat');sendMessage('Tell me about '+place.name+' and what a student can budget there.');});
   actions.append(dir,ask);body.append(actions);card.append(media,body);return card;
 }
@@ -146,6 +191,7 @@ function navigate(page, updateHash=true){
   });
   if(updateHash && location.hash!=='#'+page)history.replaceState(null,'','#'+page);
   if(page==='chat' && updateHash)dom.input.focus({preventScroll:true});
+  if(['home','map','pay','profile'].includes(page))window.scrollTo({top:0,behavior:'instant'});
 }
 function switchMobile(view){navigate(view==='assistant'?'chat':'home');}
 function renderMapDestinations(){
@@ -154,8 +200,12 @@ function renderMapDestinations(){
     const card=el('div',{class:'map-destination'});
     const info=el('div');info.append(el('strong',{},p.name),el('small',{},p.address));
     if(!p.isWithinRadius)info.append(el('small',{class:'pending-copy'},'Exact 1 km eligibility not verified'));
-    const anchor=el('a',{href:p.directionsUrl,target:'_blank',rel:'noopener noreferrer'},'Walking directions ↗');
-    card.append(info,anchor);host.append(card);
+    const tools=el('div',{class:'destination-actions'});
+    const select=el('button',{type:'button',class:'map-select'+(state.selectedRouteId===p.id?' selected':''),'aria-pressed':String(state.selectedRouteId===p.id)},state.selectedRouteId===p.id?'Selected ✓':'View on map');
+    select.addEventListener('click',()=>showRoute(p));
+    const anchor=el('a',{href:p.directionsUrl,target:'_blank',rel:'noopener noreferrer'},'Walk ↗');
+    tools.append(select,anchor);
+    card.append(info,tools);host.append(card);
   }
 }
 async function loadPlaces(){
@@ -164,6 +214,8 @@ async function loadPlaces(){
     const r=await fetch('/api/places');if(!r.ok)throw Error('The place directory is unavailable');
     const data=await r.json();
     state.places=Array.isArray(data.places)?data.places:[];state.pending=Array.isArray(data.pending)?data.pending:[];state.categories=Array.isArray(data.categories)?data.categories:[];
+    if(data.campus && Number.isFinite(data.campus.lat) && Number.isFinite(data.campus.lng)) state.campus={lat:data.campus.lat,lng:data.campus.lng};
+    if(!state.selectedRouteId) $('#routeMapFrame').src=mapPreviewUrl(null);
     dom.warning.textContent=data.warning?' '+data.warning:'';
     renderCategories();renderPlaces();renderFeatured();renderMapDestinations();
   }catch(error){dom.grid.replaceChildren();dom.message.hidden=false;dom.message.textContent='Unable to load the directory. Please check the server or your connection and tap Refresh.';dom.resultsNote.textContent='Offline or service unavailable';}
@@ -173,6 +225,7 @@ function attach(){
   dom.input.addEventListener('input',resizeInput);
   dom.input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();dom.form.requestSubmit();}});
   $('#newChat').addEventListener('click',newConversation);
+  $('#toggleSuggestions').addEventListener('click',()=>setSuggestionsCollapsed(!$('#suggestionTray').hidden));
   $('#refreshPlaces').addEventListener('click',loadPlaces);
   $('#featuredPrev').addEventListener('click',()=>dom.featured.scrollBy({left:-230,behavior:'smooth'}));
   $('#featuredNext').addEventListener('click',()=>dom.featured.scrollBy({left:230,behavior:'smooth'}));

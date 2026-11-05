@@ -183,3 +183,55 @@ body { background: #edf2f5; }
   .featured-rail .preview-actions button, .featured-rail .preview-actions a { font-size: 9px; padding: 7px 3px; }
   .composer textarea { overflow-y: auto; height: 40px; max-height: 100px; }
 }
+
+/* Conversation-first: free the chat area immediately after a student asks a question. */
+.suggestions-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:9px;}
+.suggestions-heading .prompt-title{margin:0;}
+.suggestions-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 10px;border:1px solid #dce7ef;border-radius:9px;background:#f3f8fa;color:#2c5670;font-size:11px;font-weight:800;line-height:1.2;}
+.suggestions-toggle:hover{background:#e8f2f6;}
+.suggestions-toggle span{font-size:15px;}
+.suggestion-tray[hidden]{display:none!important;}
+.chat-has-questions .assistant-bottom{padding-top:9px;}
+.chat-has-questions .suggestions-heading{margin-bottom:6px;}
+.chat-has-questions .suggestions-heading .prompt-title{display:none;}
+.chat-has-questions .suggestions-toggle{padding:6px 9px;}
+.chat {min-height:0;scroll-padding-top:12px;}
+/* A route starts inside the Map tab. Full Google Maps walking navigation is a separate, clear action. */
+.selected-route{display:flex;gap:14px;align-items:center;border:1px solid #dbe7ef;border-radius:14px;padding:15px;background:#f1f7fa;}
+.route-icon{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;color:#174862;background:#e2edf4;font-size:25px;}
+.route-details{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1;}
+.route-details strong{font-size:17px;}
+.route-details>span:not(.overline){font-size:12px;color:#607789;line-height:1.4;}
+.route-details .route-warning{color:#96633a!important;font-weight:600;}
+.route-open-google{flex:none;border-radius:9px;text-decoration:none;background:#183b55;color:#fff;padding:12px 14px;font-size:12px;font-weight:800;text-align:center;}
+.route-open-google:hover{background:#24577a;}
+.map-disclaimer{margin:-10px 0 18px;font-size:11px;line-height:1.6;color:#6d8290;}
+.map-destination .destination-actions{display:flex;flex-direction:row;align-items:center;gap:7px;}
+.map-select{border:1px solid #bfd4e1;border-radius:8px;background:#fff;color:#285b78;font-size:11px;font-weight:800;padding:11px 13px;white-space:nowrap;}
+.map-select.selected{background:#e4f1eb;border-color:#9bc8af;color:#317353;}
+@media(max-width:800px){
+ .suggestions-heading{margin-bottom:6px;}
+ .suggestions-toggle{font-size:10px;padding:7px 8px;}
+ .chat-has-questions .assistant-bottom{padding:8px 10px 6px;}
+ .chat-has-questions .assistant-fineprint{display:none;}
+ .selected-route{align-items:stretch;flex-wrap:wrap;gap:10px;padding:12px;}
+ .route-icon{width:36px;height:36px;font-size:21px;}
+ .route-details{flex-basis:calc(100% - 46px);}
+ .route-details strong{font-size:15px;}
+ .route-open-google{width:100%;}
+ .map-frame-wrap iframe{height:min(49dvh,390px);min-height:270px;}
+ .map-destination .destination-actions{width:100%;}
+ .map-destination .destination-actions>*{flex:1;text-align:center;}
+}
+
+/* Sections not selected by the bottom navigation must not occupy page space. */
+[hidden]{display:none!important;}
+@media(min-width:801px){
+ .shell[data-page="chat"] .assistant-head{padding-block:15px;}
+ .shell[data-page="chat"] .featured-rail .preview-card{flex-basis:246px;width:246px;height:112px;flex-direction:row;}
+ .shell[data-page="chat"] .featured-rail .preview-image{height:112px;width:99px;flex:none;}
+ .shell[data-page="chat"] .featured-rail .preview-image .image-empty{min-height:112px;}
+ .shell[data-page="chat"] .featured-rail .preview-body{min-width:0;flex:1;padding:9px 9px 8px;}
+ .shell[data-page="chat"] .featured-rail .preview-actions{gap:5px;}
+ .shell[data-page="chat"] .featured-rail .preview-actions button{font-size:10px;padding:7px 5px;}
+}
