@@ -7,7 +7,7 @@
   <meta name="description" content="CBD Ventures AI Assistance: a student-friendly guide to places around the Pretoria campus, directions and study-day budgets.">
   <link rel="icon" href="/icon.svg">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="stylesheet" href="/styles.css?v=6">
+  <link rel="stylesheet" href="/styles.css?v=7">
   <title>CBD Ventures AI Assistance</title>
 </head>
 <body>
@@ -38,31 +38,13 @@
           <p class="assistant-fineprint" id="modeNote">Suggestions are student-friendly; check prices and addresses before visiting</p>
         </div>
       </section>
-      <section class="explore-panel" id="explorePanel" aria-labelledby="exploreTitle">
-        <div class="intro">
-          <div class="eyebrow"><span class="eyebrow-line"></span> YOUR CAMPUS. YOUR CITY.</div>
-          <h1 id="exploreTitle">The city, <em>within reach.</em></h1>
-          <p>Food runs, study breaks and everyday essentials — discover spots around Richfield Pretoria.</p>
-          <div class="campus-banner"><span class="pin-icon">⌖</span><div><strong>Starting point: Richfield Pretoria</strong><span>291 Helen Joseph Street · All directions start here</span></div><span class="campus-badge">1 km radius</span></div>
-        </div>
-        <div class="directory-tools">
-          <div class="section-heading"><div><span class="overline">EXPLORE THE AREA</span><h2>Places near campus <span id="placesCount" class="count">…</span></h2></div><button class="refresh" id="refreshPlaces" type="button" title="Refresh places">↻ Refresh</button></div>
-          <label class="search-box"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="7.4"/><path d="m16 16 5 5"/></svg><input id="placeSearch" type="search" autocomplete="off" placeholder="Search Honchos, printing, library…" aria-label="Search places"><span class="search-shortcut">⌕</span></label>
-          <div class="category-strip" id="categories" aria-label="Filter place categories"></div>
-          <div class="tab-row" role="tablist" aria-label="Location verification"><button class="tab active" role="tab" aria-selected="true" id="allTab" data-tab="all" type="button">All places</button><button class="tab" role="tab" aria-selected="false" id="nearbyTab" data-tab="nearby" type="button">Verified radius <span id="nearbyTotal">0</span></button><button class="tab" role="tab" aria-selected="false" id="pendingTab" data-tab="pending" type="button">Student picks <span id="pendingTotal">0</span></button></div>
-          <p id="resultsNote" class="results-note" aria-live="polite"></p>
-        </div>
-        <div id="placesGrid" class="places-grid" aria-live="polite"></div>
-        <div id="placeMessage" class="place-message" hidden></div>
-        <footer class="directory-footer">Distances use straight-line map coordinates, not walking distance. Student picks without confirmed coordinates are shown separately. Prices are planning examples, not actual menus. <span id="directoryWarning"></span></footer>
-      </section>
     </main>
     <nav class="app-nav" aria-label="Main navigation">
-      <button type="button" data-page="home"><span aria-hidden="true">⌂</span>Home</button>
+      <button type="button" data-page="home" disabled aria-disabled="true"><span aria-hidden="true">⌂</span>Home</button>
       <button type="button" data-page="map"><span aria-hidden="true">⌖</span>Map</button>
       <button type="button" data-page="chat" class="active" aria-current="page"><span aria-hidden="true">✳</span>Chat</button>
-      <button type="button" data-page="pay"><span aria-hidden="true">▤</span>Pay</button>
-      <button type="button" data-page="profile"><span aria-hidden="true">♙</span>Profile</button>
+      <button type="button" data-page="pay" disabled aria-disabled="true"><span aria-hidden="true">▤</span>Pay</button>
+      <button type="button" data-page="profile" disabled aria-disabled="true"><span aria-hidden="true">♙</span>Profile</button>
     </nav>
     <section id="mapPage" class="extra-page" hidden aria-label="Map and campus directions">
       <div class="page-intro"><span class="overline">CAMPUS MAP</span><h1>Explore Pretoria from Richfield</h1><p>All walking-directions links start at Richfield Pretoria Campus, 291 Helen Joseph Street. Locations awaiting verification may not be within 1 km.</p></div>
@@ -75,9 +57,7 @@
       <p class="map-disclaimer">The map preview shows Richfield and any verified destination pin; it does not draw a walking route. For actual walking directions from campus, choose <strong>Open in Google Maps</strong>. Student-submitted addresses may need checking.</p>
       <h2>Choose your destination</h2><div id="mapDestinations" class="map-destinations"></div>
     </section>
-    <section id="payPage" class="extra-page" hidden aria-label="Pay page"><div class="page-intro"><span class="overline">CBD VENTURES</span><h1>Pay</h1><p>This section is reserved for the team's payment integration. No payments can be made here yet.</p><button type="button" class="page-action" data-go="chat">Ask the assistant</button></div></section>
-    <section id="profilePage" class="extra-page" hidden aria-label="Profile page"><div class="page-intro"><span class="overline">CBD VENTURES</span><h1>Profile</h1><p>This section is reserved for your team's account and sign-in functionality. It does not collect student credentials.</p><button type="button" class="page-action" data-go="chat">Ask the assistant</button></div></section>
   </div>
-  <script src="/app.js?v=6" defer></script>
+  <script src="/app.js?v=7" defer></script>
 </body>
 </html>

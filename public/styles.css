@@ -9,7 +9,7 @@
 @media(max-width:500px){.places-grid{grid-template-columns:1fr}.place-card{display:grid;grid-template-columns:116px minmax(0,1fr);min-height:153px}.place-media{height:100%;min-height:158px}.place-info{padding:10px;gap:5px}.place-name{font-size:12px}.place-distance{font-size:9px;padding:5px}.place-address,.place-desc{font-size:10px}.place-warning{font-size:9px}.place-actions{padding-top:4px}.directions{font-size:10px;padding:9px 5px}.ask-place{font-size:10px;padding:8px 6px}.campus-banner{padding:12px 10px}.campus-banner strong{font-size:11px}.campus-banner div span{font-size:10px}.campus-badge{font-size:9px;padding:6px}.intro h1{font-size:33px}.section-heading h2{font-size:19px}.tab-row{gap:19px}.tab{font-size:11px}.assistant-panel{height:calc(100dvh - 159px)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
 
-/* Shared five-page navigation; desktop and mobile. */
+
 [hidden]{display:none!important}
 .shell{padding-bottom:76px}
 .app-nav{position:fixed;z-index:30;bottom:0;left:0;right:0;display:flex;align-items:stretch;justify-content:center;background:#fff;border-top:1px solid var(--line);box-shadow:0 -4px 22px rgba(22,44,64,.06);min-height:66px;padding-bottom:env(safe-area-inset-bottom)}
@@ -22,7 +22,7 @@
 .shell[data-page="chat"] .explore-panel{display:none}.shell[data-page="chat"] .layout{display:block;max-width:1100px}.shell[data-page="chat"] .assistant-panel{height:calc(100dvh - 200px);min-height:480px;position:static}
 @media(max-width:800px){.mobile-nav{display:none!important}.layout{padding-bottom:20px}.shell[data-page="home"] .assistant-panel{display:none}.shell[data-page="chat"] .assistant-panel{display:flex;height:calc(100dvh - 172px);min-height:400px}.extra-page{margin:12px;padding:16px}.map-destinations{grid-template-columns:1fr}.map-destination{align-items:flex-start;flex-direction:column}.app-nav button{flex:1;min-width:0;font-size:10px}.app-nav button span{font-size:21px}}
 
-/* CHAT-FIRST REDESIGN — full-width assistant, swipeable student places, no split screen. */
+
 [hidden] { display: none !important; }
 html, body { min-width: 320px; }
 body { background: #edf2f5; }
@@ -165,7 +165,7 @@ body { background: #edf2f5; }
 }
 @media (prefers-reduced-motion: reduce) { .featured-rail, .inline-place-rail { scroll-behavior: auto; } }
 
-/* Short phone screens: keep the conversation legible instead of allowing the carousel to squeeze it. */
+
 @media (max-width: 800px) and (max-height: 700px) {
   .assistant-head .overline { display: none; }
   .assistant-head h2 { margin-top: 0; font-size: 15px; }
@@ -184,7 +184,7 @@ body { background: #edf2f5; }
   .composer textarea { overflow-y: auto; height: 40px; max-height: 100px; }
 }
 
-/* Conversation-first: free the chat area immediately after a student asks a question. */
+
 .suggestions-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:9px;}
 .suggestions-heading .prompt-title{margin:0;}
 .suggestions-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 10px;border:1px solid #dce7ef;border-radius:9px;background:#f3f8fa;color:#2c5670;font-size:11px;font-weight:800;line-height:1.2;}
@@ -196,7 +196,7 @@ body { background: #edf2f5; }
 .chat-has-questions .suggestions-heading .prompt-title{display:none;}
 .chat-has-questions .suggestions-toggle{padding:6px 9px;}
 .chat {min-height:0;scroll-padding-top:12px;}
-/* A route starts inside the Map tab. Full Google Maps walking navigation is a separate, clear action. */
+
 .selected-route{display:flex;gap:14px;align-items:center;border:1px solid #dbe7ef;border-radius:14px;padding:15px;background:#f1f7fa;}
 .route-icon{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:12px;color:#174862;background:#e2edf4;font-size:25px;}
 .route-details{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1;}
@@ -224,7 +224,7 @@ body { background: #edf2f5; }
  .map-destination .destination-actions>*{flex:1;text-align:center;}
 }
 
-/* Sections not selected by the bottom navigation must not occupy page space. */
+
 [hidden]{display:none!important;}
 @media(min-width:801px){
  .shell[data-page="chat"] .assistant-head{padding-block:15px;}
@@ -235,3 +235,6 @@ body { background: #edf2f5; }
  .shell[data-page="chat"] .featured-rail .preview-actions{gap:5px;}
  .shell[data-page="chat"] .featured-rail .preview-actions button{font-size:10px;padding:7px 5px;}
 }
+
+.app-nav button:disabled{opacity:.38;cursor:default;pointer-events:none;background:transparent;color:#8895a1;border-top-color:transparent;}
+.app-nav button:disabled:hover{background:transparent;}
